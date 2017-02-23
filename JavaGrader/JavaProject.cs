@@ -29,15 +29,12 @@ namespace JavaGrader
 			string[] zipFiles = Directory.GetFiles(myWorkingPath, "*.zip", SearchOption.TopDirectoryOnly);
 			if (zipFiles.Length == 0)
 			{
-				Console.WriteLine("[No archive found]");
+				Console.WriteLine("No archive found.");
 			}
 			else
 			{
-				Console.WriteLine("[Opening archive]");
 				try
 				{
-					//ZipFile.ExtractToDirectory(zipFiles[0], myWorkingPath);
-
 					using (ZipArchive zip = ZipFile.OpenRead(zipFiles[0]))
 					{
 						foreach (ZipArchiveEntry entry in zip.Entries)
@@ -52,7 +49,7 @@ namespace JavaGrader
 				}
 				catch
 				{
-					Console.WriteLine("[Skipping archive extraction]");
+					Console.WriteLine("Skipping archive extraction");
 				}
 			}
 		}
@@ -81,7 +78,7 @@ namespace JavaGrader
 
 			if (!myFoundMainClassFlag)
 			{
-				throw new InvalidProjectException("[Error locating Java main file]");
+				throw new InvalidProjectException("Error locating Java main file");
 			}
 		}
 
@@ -115,7 +112,7 @@ namespace JavaGrader
 
 					if (myFoundMainClassFlag)
 					{
-						Console.WriteLine("[WARNING: Found multiple classes with main method]");
+						Console.WriteLine("WARNING: Found multiple classes with main method");
 						if (mainClassName.ToLower() != "main")
 						{
 							return;
@@ -137,7 +134,7 @@ namespace JavaGrader
 			}
 			catch
 			{
-				Console.WriteLine("[Error attempting to process file]");
+				Console.WriteLine("Error attempting to process file");
 			}
 		}
 
@@ -146,7 +143,6 @@ namespace JavaGrader
 			string[] classFiles = Directory.GetFiles(myWorkingPath, "*.class", SearchOption.AllDirectories);
 			if (classFiles.Length > 0)
 			{
-				Console.WriteLine("[Deleting class files]");
 				foreach (string classFile in classFiles)
 				{
 					try

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Text;
+using System.Threading;
 using System.Diagnostics;
 using System.IO;
 
@@ -30,7 +32,7 @@ namespace JavaGrader
 
 			if (!myValidFlag)
 			{
-				throw new InvalidProjectException("[Unable to find JDK binaries!Please install the JDK on your system and try again.]");
+				throw new InvalidProjectException("Unable to find JDK binaries! Please install the JDK on your system and try again.");
 			}
 		}
 
@@ -91,7 +93,6 @@ namespace JavaGrader
 			int exitCode = 1;
 			try
 			{
-				Console.WriteLine("[Compiling]");
 				Directory.SetCurrentDirectory(project.WorkingPath);
 				ProcessStartInfo javacStart = new ProcessStartInfo(this.JavaCompiler, project.MainFileName);
 				javacStart.UseShellExecute = false;
@@ -107,36 +108,48 @@ namespace JavaGrader
 
 			if (exitCode != 0)
 			{
-				throw new InvalidProjectException("[Error compiling project]");
+				throw new InvalidProjectException("Error compiling project");
 			}
 		}
 
-		public void Run(JavaProject project) => Run(project, "");
+		public void Run(JavaProject project) => Run(project, null);
 
-		public void Run(JavaProject project, string parameters)
+		public void Run(JavaProject project, StreamReader input)
 		{
-			string storedCurDir = Directory.GetCurrentDirectory();
+			string storedCurDir = Directory.GetCurrentDirectory(), inputLine, errorMsg = "";
 			int exitCode = 1;
 			try
 			{
-				Console.WriteLine("[Running]");
 				Directory.SetCurrentDirectory(project.WorkingPath);
-				string javaParams;
-				if (parameters.Trim() == "")
-				{
-					javaParams = project.QualifiedMainClass;
-				}
-				else
-				{
-					javaParams = string.Format("{0} {1}", project.QualifiedMainClass, parameters);
-				}
-				ProcessStartInfo javaStart = new ProcessStartInfo(this.JavaRuntime, javaParams);
+				ProcessStartInfo javaStart = new ProcessStartInfo(this.JavaRuntime, string.Format("-Dfile.encoding=utf8 {0}", project.QualifiedMainClass));
 				javaStart.UseShellExecute = false;
+				javaStart.RedirectStandardInput = true;
+				javaStart.RedirectStandardError = true;
 				Process java = Process.Start(javaStart);
+
+				if (input != null)
+				{
+					java.StandardInput.WriteLine("a");
+					Thread.Sleep(250);
+					while (!input.EndOfStream)
+					{
+						Thread.Sleep(50);
+						inputLine = input.ReadLine();
+						
+						if (inputLine.Trim() != "")
+						{
+							Console.WriteLine(inputLine);
+							java.StandardInput.WriteLine(inputLine);
+						}
+					}
+				}
+
 				java.WaitForExit();
+
+				errorMsg = java.StandardError.ReadToEnd();
 				exitCode = java.ExitCode;
 			}
-			catch { }
+			catch (Exception e) { Console.WriteLine(e.Message); }
 			finally
 			{
 				Directory.SetCurrentDirectory(storedCurDir);
@@ -144,7 +157,7 @@ namespace JavaGrader
 
 			if (exitCode != 0)
 			{
-				throw new InvalidProjectException("[Error running project]");
+				throw new InvalidProjectException("Runtime Error:\n" + errorMsg);
 			}
 		}
 	}

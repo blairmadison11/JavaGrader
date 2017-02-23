@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.IO;
 
 namespace JavaGrader
@@ -19,7 +20,7 @@ namespace JavaGrader
 
 		public bool HasNext => myCurrentIndex < myInputFiles.Length;
 
-		public string Next => myInputFiles[myCurrentIndex++];
+		public StreamReader Next => new StreamReader(new FileStream(myInputFiles[myCurrentIndex++], FileMode.Open), Encoding.UTF8);
 
 		public int Index => myCurrentIndex + 1;
 	}

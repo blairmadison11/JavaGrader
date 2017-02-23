@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 
 namespace JavaGrader
 {
@@ -15,22 +16,29 @@ namespace JavaGrader
 
 			try
 			{
+				Console.InputEncoding = Encoding.UTF8;
+				Console.OutputEncoding = Encoding.UTF8;
+
 				JDK jdk = new JDK();
 				jdk.LoadBinaries();
 
+				Console.WriteLine("[Extracting]");
 				JavaProject project = new JavaProject(args[0]);
 				project.ExtractArchive();
 				project.LoadAndCanonicalize();
 				project.DeleteClassFiles();
 
+				Console.WriteLine("[Compiling]");
 				jdk.Compile(project);
 
+				Console.WriteLine("[Running]");
 				GradingInput input = new GradingInput();
 				if (input.Exists)
 				{
-					Console.WriteLine(string.Format("Press enter to run test input #{0}\n"), input.Index);
 					while (input.HasNext)
 					{
+						Console.WriteLine(string.Format("TEST INPUT #{0} (press enter)", input.Index));
+						Console.ReadLine();
 						jdk.Run(project, input.Next);
 					}
 				}
