@@ -16,6 +16,10 @@ namespace JavaGrader
 			myValidFlag = false;
 		}
 
+		public string JavaCompiler => string.Format("{0}\\{1}", myBinPath, "javac.exe");
+
+		public string JavaRuntime => string.Format("{0}\\{1}", myBinPath, "java.exe");
+
 		public void LoadBinaries()
 		{
 			if (!LoadFromFile())
@@ -107,10 +111,7 @@ namespace JavaGrader
 			}
 		}
 
-		public void Run(JavaProject project)
-		{
-			Run(project, "");
-		}
+		public void Run(JavaProject project) => Run(project, "");
 
 		public void Run(JavaProject project, string parameters)
 		{
@@ -144,22 +145,6 @@ namespace JavaGrader
 			if (exitCode != 0)
 			{
 				throw new InvalidProjectException("[Error running project]");
-			}
-		}
-
-		public string JavaCompiler
-		{
-			get
-			{
-				return string.Format("{0}\\{1}", myBinPath, "javac.exe");
-			}
-		}
-
-		public string JavaRuntime
-		{
-			get
-			{
-				return string.Format("{0}\\{1}", myBinPath, "java.exe");
 			}
 		}
 	}

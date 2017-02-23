@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GradingInput.cs" />
     <Compile Include="JavaProject.cs" />
     <Compile Include="JDK.cs" />
     <Compile Include="Program.cs" />

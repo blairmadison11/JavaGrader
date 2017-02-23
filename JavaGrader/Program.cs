@@ -24,9 +24,15 @@ namespace JavaGrader
 				project.DeleteClassFiles();
 
 				jdk.Compile(project);
-				if (File.Exists("input.txt"))
+
+				GradingInput input = new GradingInput();
+				if (input.Exists)
 				{
-					jdk.Run(project, Path.GetFullPath("input.txt"));
+					Console.WriteLine(string.Format("Press enter to run test input #{0}\n"), input.Index);
+					while (input.HasNext)
+					{
+						jdk.Run(project, input.Next);
+					}
 				}
 				else
 				{

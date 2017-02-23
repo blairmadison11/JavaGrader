@@ -18,6 +18,12 @@ namespace JavaGrader
 			myWorkingPath = Path.Combine(Directory.GetCurrentDirectory(), userName);
 		}
 
+		public string MainFileName => myMainFileName;
+
+		public string QualifiedMainClass => myQualifiedMainClass;
+
+		public string WorkingPath => myWorkingPath;
+
 		public void ExtractArchive()
 		{
 			string[] zipFiles = Directory.GetFiles(myWorkingPath, "*.zip", SearchOption.TopDirectoryOnly);
@@ -149,30 +155,6 @@ namespace JavaGrader
 					}
 					catch { }
 				}
-			}
-		}
-
-		public string MainFileName
-		{
-			get
-			{
-				return myMainFileName;
-			}
-		}
-
-		public string QualifiedMainClass
-		{
-			get
-			{
-				return myQualifiedMainClass;
-			}
-		}
-
-		public string WorkingPath
-		{
-			get
-			{
-				return myWorkingPath;
 			}
 		}
 	}
