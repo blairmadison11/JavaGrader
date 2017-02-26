@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Text;
 
 namespace JavaGrader
@@ -10,7 +9,7 @@ namespace JavaGrader
         {
             if (args.Length == 0)
             {
-                Console.WriteLine("Usage: JavaGrader.exe [folder_name]");
+                Console.WriteLine("Usage: JavaGrader.exe [-c] [-m] <folder_name>");
                 return;
             }
 
@@ -19,11 +18,13 @@ namespace JavaGrader
 				Console.InputEncoding = Encoding.UTF8;
 				Console.OutputEncoding = Encoding.UTF8;
 
+				Flags flags = new Flags(args);
+
 				JDK jdk = new JDK();
 				jdk.LoadBinaries();
 
 				Console.WriteLine("[Extracting]");
-				JavaProject project = new JavaProject(args[0]);
+				JavaProject project = new JavaProject(flags.GradingFolder);
 				project.ExtractArchive();
 				project.LoadAndCanonicalize();
 				project.DeleteClassFiles();
@@ -31,20 +32,23 @@ namespace JavaGrader
 				Console.WriteLine("[Compiling]");
 				jdk.Compile(project);
 
-				Console.WriteLine("[Running]");
-				GradingInput input = new GradingInput();
-				if (input.Exists)
+				if (!flags.CompileOnly)
 				{
-					while (input.HasNext)
+					Console.WriteLine("[Running]");
+					GradingInput input = new GradingInput();
+					if (!flags.ManualMode && input.Exists)
 					{
-						Console.WriteLine(string.Format("TEST INPUT #{0} (press enter)", input.Index));
-						Console.ReadLine();
-						jdk.Run(project, input.Next);
+						while (input.HasNext)
+						{
+							Console.WriteLine(string.Format("[Test Input #{0}]\n(press enter)", input.Index));
+							Console.ReadLine();
+							jdk.Run(project, input.Next);
+						}
 					}
-				}
-				else
-				{
-					jdk.Run(project);
+					else
+					{
+						jdk.Run(project);
+					}
 				}
 			}
 			catch (InvalidProjectException e)

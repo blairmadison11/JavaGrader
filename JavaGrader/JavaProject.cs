@@ -29,7 +29,7 @@ namespace JavaGrader
 			string[] zipFiles = Directory.GetFiles(myWorkingPath, "*.zip", SearchOption.TopDirectoryOnly);
 			if (zipFiles.Length == 0)
 			{
-				Console.WriteLine("No archive found.");
+				Console.WriteLine("(Warning) No archive found.");
 			}
 			else
 			{
@@ -49,7 +49,7 @@ namespace JavaGrader
 				}
 				catch
 				{
-					Console.WriteLine("Skipping archive extraction");
+					Console.WriteLine("(Warning) Archive extraction failed.");
 				}
 			}
 		}
@@ -78,7 +78,7 @@ namespace JavaGrader
 
 			if (!myFoundMainClassFlag)
 			{
-				throw new InvalidProjectException("Error locating Java main file");
+				throw new InvalidProjectException("(Error) No Java main file found.");
 			}
 		}
 
@@ -112,7 +112,7 @@ namespace JavaGrader
 
 					if (myFoundMainClassFlag)
 					{
-						Console.WriteLine("WARNING: Found multiple classes with main method");
+						Console.WriteLine("(Warning) Found multiple entry-point classes.");
 						if (mainClassName.ToLower() != "main")
 						{
 							return;
@@ -134,7 +134,7 @@ namespace JavaGrader
 			}
 			catch
 			{
-				Console.WriteLine("Error attempting to process file");
+				Console.WriteLine("(Warning) Unable to process file: " + fileName);
 			}
 		}
 

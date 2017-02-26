@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Text;
-using System.Threading;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 
 namespace JavaGrader
 {
@@ -32,7 +31,7 @@ namespace JavaGrader
 
 			if (!myValidFlag)
 			{
-				throw new InvalidProjectException("Unable to find JDK binaries! Please install the JDK on your system and try again.");
+				throw new InvalidProjectException("(Error) Unable to find JDK binaries. Please install the JDK on your system and try again.");
 			}
 		}
 
@@ -108,7 +107,7 @@ namespace JavaGrader
 
 			if (exitCode != 0)
 			{
-				throw new InvalidProjectException("Error compiling project");
+				throw new InvalidProjectException("(Error) Project compilation failed.");
 			}
 		}
 
@@ -123,7 +122,10 @@ namespace JavaGrader
 				Directory.SetCurrentDirectory(project.WorkingPath);
 				ProcessStartInfo javaStart = new ProcessStartInfo(this.JavaRuntime, string.Format("-Dfile.encoding=utf8 {0}", project.QualifiedMainClass));
 				javaStart.UseShellExecute = false;
-				javaStart.RedirectStandardInput = true;
+				if (input != null)
+				{
+					javaStart.RedirectStandardInput = true;
+				}
 				javaStart.RedirectStandardError = true;
 				Process java = Process.Start(javaStart);
 
