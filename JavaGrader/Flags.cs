@@ -1,12 +1,18 @@
-﻿namespace JavaGrader
+﻿using System.Collections.Generic;
+
+namespace JavaGrader
 {
 	class Flags
 	{
-		private bool myManualModeFlag = false, myCompileOnlyFlag = false;
+		enum Flag { MANUAL_MODE, COMPILE_ONLY, UTF8_MODE }
+
+		private List<Flag> myFlags;
+		private bool myGradingFolderFlag = false, myInvalidFlagsFlag = false;
 		private string myGradingFolder = "";
 
 		public Flags(string[] args)
 		{
+			myFlags = new List<Flag>();
 			foreach (string arg in args)
 			{
 				if (arg.StartsWith("-"))
@@ -16,13 +22,16 @@
 				else
 				{
 					myGradingFolder = arg;
+					myGradingFolderFlag = true;
 				}
 			}
 		}
 
-		public bool ManualMode => myManualModeFlag;
-		public bool CompileOnly => myCompileOnlyFlag;
+		public bool ManualMode => myFlags.Contains(Flag.MANUAL_MODE);
+		public bool CompileOnly => myFlags.Contains(Flag.COMPILE_ONLY);
+		public bool Utf8Mode => myFlags.Contains(Flag.UTF8_MODE);
 		public string GradingFolder => myGradingFolder;
+		public bool AreValid => myGradingFolderFlag && !myInvalidFlagsFlag;
 
 		private void ProcessFlag(string flag)
 		{
@@ -31,10 +40,16 @@
 				switch(c)
 				{
 					case 'm':
-						myManualModeFlag = true;
+						myFlags.Add(Flag.MANUAL_MODE);
 						break;
 					case 'c':
-						myCompileOnlyFlag = true;
+						myFlags.Add(Flag.COMPILE_ONLY);
+						break;
+					case '8':
+						myFlags.Add(Flag.UTF8_MODE);
+						break;
+					default:
+						myInvalidFlagsFlag = true;
 						break;
 				}
 			}

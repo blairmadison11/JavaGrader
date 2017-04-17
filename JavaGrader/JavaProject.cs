@@ -29,7 +29,7 @@ namespace JavaGrader
 			string[] zipFiles = Directory.GetFiles(myWorkingPath, "*.zip", SearchOption.TopDirectoryOnly);
 			if (zipFiles.Length == 0)
 			{
-				Console.WriteLine("(Warning) No archive found.");
+				Console.WriteLine("Warning: No archive found.");
 			}
 			else
 			{
@@ -42,30 +42,16 @@ namespace JavaGrader
 							if (!entry.FullName.Contains("__") && entry.Name.EndsWith(".java"))
 							{
 								Console.WriteLine("Extracting file: {0}", entry.Name);
-								entry.ExtractToFile(Path.Combine(myWorkingPath, entry.Name));
+								entry.ExtractToFile(Path.Combine(myWorkingPath, entry.Name), true);
 							}
 						}
 					}
 				}
 				catch
 				{
-					Console.WriteLine("(Warning) Archive extraction failed.");
+					Console.WriteLine("Warning: Archive extraction failed.");
 				}
 			}
-		}
-
-		private string SanitizeFileName(string str)
-		{
-			string regexSearch = new string(Path.GetInvalidFileNameChars());
-			Regex r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
-			return r.Replace(str, "");
-		}
-
-		private string SanitizePathName(string str)
-		{
-			string regexSearch = new string(Path.GetInvalidPathChars());
-			Regex r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
-			return r.Replace(str, "");
 		}
 
 		public void LoadAndCanonicalize()
@@ -78,7 +64,7 @@ namespace JavaGrader
 
 			if (!myFoundMainClassFlag)
 			{
-				throw new InvalidProjectException("(Error) No Java main file found.");
+				throw new InvalidProjectException("Error: No project entry-point found.");
 			}
 		}
 
@@ -112,7 +98,7 @@ namespace JavaGrader
 
 					if (myFoundMainClassFlag)
 					{
-						Console.WriteLine("(Warning) Found multiple entry-point classes.");
+						Console.WriteLine("Warning: Found multiple project entry-points.");
 						if (mainClassName.ToLower() != "main")
 						{
 							return;
@@ -134,7 +120,7 @@ namespace JavaGrader
 			}
 			catch
 			{
-				Console.WriteLine("(Warning) Unable to process file: " + fileName);
+				Console.WriteLine("Warning: Unable to process file: " + Path.GetFileName(fileName));
 			}
 		}
 

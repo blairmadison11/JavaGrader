@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 
+
 namespace JavaGrader
 {
 	class JDK
@@ -31,7 +32,7 @@ namespace JavaGrader
 
 			if (!myValidFlag)
 			{
-				throw new InvalidProjectException("(Error) Unable to find JDK binaries. Please install the JDK on your system and try again.");
+				throw new InvalidProjectException("Error: Unable to find JDK binaries. Please install the JDK on your system and try again.");
 			}
 		}
 
@@ -107,43 +108,77 @@ namespace JavaGrader
 
 			if (exitCode != 0)
 			{
-				throw new InvalidProjectException("(Error) Project compilation failed.");
+				throw new InvalidProjectException("Error: Project compilation failed.");
 			}
 		}
 
-		public void Run(JavaProject project) => Run(project, null);
+		public void Run(JavaProject project, Flags flags) => Run(project, flags, null);
 
-		public void Run(JavaProject project, StreamReader input)
+		public void Run(JavaProject project, Flags flags, StreamReader input)
 		{
-			string storedCurDir = Directory.GetCurrentDirectory(), inputLine, errorMsg = "";
+			string storedCurDir = Directory.GetCurrentDirectory(), inputLine = "", errorMsg = "";
 			int exitCode = 1;
 			try
 			{
 				Directory.SetCurrentDirectory(project.WorkingPath);
-				ProcessStartInfo javaStart = new ProcessStartInfo(this.JavaRuntime, string.Format("-Dfile.encoding=utf8 {0}", project.QualifiedMainClass));
-				javaStart.UseShellExecute = false;
-				if (input != null)
+				String javaParams;
+				if (flags.Utf8Mode)
 				{
-					javaStart.RedirectStandardInput = true;
+					javaParams = string.Format("-Dfile.encoding=utf8 {0}", project.QualifiedMainClass);
 				}
+				else
+				{
+					javaParams = project.QualifiedMainClass;
+				}
+				ProcessStartInfo javaStart = new ProcessStartInfo(this.JavaRuntime, javaParams);
+				javaStart.UseShellExecute = false;
 				javaStart.RedirectStandardError = true;
-				Process java = Process.Start(javaStart);
+				Process java;
 
 				if (input != null)
 				{
-					java.StandardInput.WriteLine("a");
-					Thread.Sleep(250);
-					while (!input.EndOfStream)
+					javaStart.RedirectStandardInput = true;
+					java = Process.Start(javaStart);
+                    java.StandardInput.Flush();
+
+					// *** MAJOR HACK ***
+					// For some reason, the first input when using UTF-8 mode
+					// is "corrupt" (treated as bad input by the receiving program).
+					// So we give it a dummy input before sending the real input.
+					//
+					// Obviously, this doesn't work for all programs.
+					// This really shouldn't be here.
+					// Why is this here?
+					// This is bad, very bad. Please delete this.
+					/*
+                    if (utf8Mode)
 					{
-						Thread.Sleep(50);
-						inputLine = input.ReadLine();
-						
-						if (inputLine.Trim() != "")
-						{
-							Console.WriteLine(inputLine);
-							java.StandardInput.WriteLine(inputLine);
-						}
+						java.StandardInput.WriteLine("a");
 					}
+                    */
+
+					while (!java.HasExited && !input.EndOfStream)
+					{
+						Thread.Sleep(200);
+						inputLine = input.ReadLine();
+						Console.WriteLine(inputLine);
+						java.StandardInput.WriteLine(inputLine);
+						/*
+						foreach (ProcessThread thread in java.Threads)
+						{
+							if (thread.ThreadState == System.Diagnostics.ThreadState.Wait && thread.WaitReason == ThreadWaitReason.UserRequest)
+							{
+								inputLine = input.ReadLine();
+								Console.WriteLine(inputLine);
+								java.StandardInput.WriteLine(inputLine);
+							}
+						}
+						*/
+					}
+				}
+				else
+				{
+					java = Process.Start(javaStart);
 				}
 
 				java.WaitForExit();

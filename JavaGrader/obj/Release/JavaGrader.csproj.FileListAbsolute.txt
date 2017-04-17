@@ -1,0 +1,6 @@
+C:\Users\blair\Development\GitHub\JavaGrader\JavaGrader\bin\Release\JavaGrader.exe.config
+C:\Users\blair\Development\GitHub\JavaGrader\JavaGrader\bin\Release\JavaGrader.exe
+C:\Users\blair\Development\GitHub\JavaGrader\JavaGrader\bin\Release\JavaGrader.pdb
+C:\Users\blair\Development\GitHub\JavaGrader\JavaGrader\obj\Release\JavaGrader.exe
+C:\Users\blair\Development\GitHub\JavaGrader\JavaGrader\obj\Release\JavaGrader.pdb
+C:\Users\blair\Development\GitHub\JavaGrader\JavaGrader\obj\Release\JavaGrader.csprojResolveAssemblyReference.cache
